@@ -1,5 +1,9 @@
 use warp::Filter;
 
+use crate::todo_rest::todos_filter;
+
+mod todo_rest;
+
 const WEB_FOLDER: &str ="web-folder/";
 
 #[tokio::main]
@@ -8,7 +12,7 @@ async fn main() {
     let hi = warp::path("hi")
         .and(warp::get())
         .map(|| "hi doumo");
-    let apis = hi;
+    let apis = hi.or(todos_filter());
 
     // Static Content
     let content = warp::fs::dir(WEB_FOLDER);
@@ -16,7 +20,7 @@ async fn main() {
         .and(warp::path::end())
         .and(warp::fs::file(format!("{}/index.html", WEB_FOLDER)));
     let static_site = content.or(root);
-    
+
     let routes = apis.or(static_site);
 
     println!("Start web-server");
