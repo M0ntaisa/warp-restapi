@@ -3,6 +3,7 @@ use warp::Filter;
 use crate::todo_rest::todos_filter;
 
 mod todo_rest;
+mod security;
 
 const WEB_FOLDER: &str ="web-folder/";
 
