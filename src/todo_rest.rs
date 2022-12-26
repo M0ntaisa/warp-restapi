@@ -1,4 +1,4 @@
-use serde_json::json;
+use serde_json::{json, Value};
 use warp::{Filter, reply::Json};
 
 pub fn todos_filter() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
@@ -14,7 +14,12 @@ pub fn todos_filter() -> impl Filter<Extract = impl warp::Reply, Error = warp::R
     .and(warp::path::param()) // e.g., /todos/123
     .and_then(todo_get);
 
-  list.or(get)
+  let create = todos_base
+    .and(warp::post())
+    .and(warp::body::json())
+    .and_then(todo_create);
+
+  list.or(get).or(create)
 }
 
 async fn todo_list() -> Result<Json, warp::Rejection> {
@@ -36,5 +41,14 @@ async fn todo_get(id: i64) -> Result<Json, warp::Rejection> {
 
   // serde-json to warp-reply
   let todo = warp::reply::json(&todo);
+  Ok(todo)
+}
+
+async fn todo_create(data: Value) -> Result<Json, warp::Rejection> {
+  // TODO - write to DB
+  let todo = data;
+
+  let todo = warp::reply::json(&todo);
+
   Ok(todo)
 }
